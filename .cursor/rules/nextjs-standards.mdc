@@ -1,0 +1,31 @@
+---
+description: Next.js 16 conventions and App Router patterns
+globs: "**/*.tsx"
+alwaysApply: false
+---
+
+# Next.js Standards
+
+- **Next.js 16**: App Router; Turbopack default; use `proxy.ts` instead of deprecated `middleware.ts`
+- Route groups: (marketing), (forms), (auth)
+- Server Components by default; `"use client"` only when needed
+- Caching: opt-in with `"use cache"` directive
+- Use `next/link`, `next/image`, Metadata API
+- No secrets in client; `NEXT_PUBLIC_*` for public config only
+- Loading/error boundaries: `loading.tsx`, `error.tsx`
+- Node 20.9+; TypeScript 5.1+
+
+```tsx
+// Good: Server Component
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+
+// Good: Client only when needed
+"use client";
+export function InteractiveForm() {
+  const [state, setState] = useState();
+  return <form>...</form>;
+}
+```

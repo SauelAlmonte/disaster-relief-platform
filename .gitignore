@@ -46,9 +46,14 @@ Thumbs.db
 *.local
 
 # ─── Node / Frontend ─────────────────────────────────────
+node_modules/
 client/node_modules/
 client/dist/
 client/build/
+.next/
+out/
+.vercel
+*.tsbuildinfo
 
 # ─── Testing / Coverage ──────────────────────────────────
 coverage/

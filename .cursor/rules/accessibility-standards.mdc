@@ -1,0 +1,26 @@
+---
+description: WCAG 2.2 Level AA and ADA accessibility
+globs: "**/*.tsx"
+alwaysApply: true
+---
+
+# Accessibility Standards
+
+- WCAG 2.2 Level AA; ADA-aligned
+- Semantic HTML first (`main`, `nav`, `form`, `label`, `button`, `input`)
+- ARIA only when native semantics insufficient
+- Keyboard: logical tab order, visible focus, Enter/Space for buttons, Escape for overlays
+- Forms: every input has `<label>`; `aria-describedby` for errors, `aria-invalid` when invalid
+- Images: meaningful `alt`; decorative use `alt=""`
+
+```tsx
+// Good: Label + error association
+<label htmlFor="email">Email</label>
+<input
+  id="email"
+  type="email"
+  aria-describedby={error ? "email-error" : undefined}
+  aria-invalid={!!error}
+/>
+{error && <span id="email-error" role="alert">{error}</span>}
+```

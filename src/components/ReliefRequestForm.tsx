@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { submitReliefRequest } from "@/lib/actions";
 import { useState } from "react";
+import { FormSuccessModal } from "@/components/FormSuccessModal";
 
 const schema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -22,6 +23,8 @@ type FormData = z.infer<typeof schema>;
 
 export function ReliefRequestForm() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submittedName, setSubmittedName] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -40,7 +43,8 @@ export function ReliefRequestForm() {
     });
     const result = await submitReliefRequest(formData);
     if (result.success) {
-      setMessage({ type: "success", text: result.message ?? "Request received." });
+      setSubmittedName(`${data.firstName} ${data.lastName}`.trim());
+      setShowSuccess(true);
       reset();
     } else {
       setMessage({ type: "error", text: result.message ?? "Submission failed." });
@@ -48,7 +52,19 @@ export function ReliefRequestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <>
+      {showSuccess && (
+        <FormSuccessModal
+          title="Relief request submitted"
+          body={
+            submittedName
+              ? `Thank you, ${submittedName}. Our team is reviewing your request and will follow up as soon as possible.`
+              : "Thank you. Our team is reviewing your request and will follow up as soon as possible."
+          }
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -58,6 +74,7 @@ export function ReliefRequestForm() {
             id="firstName"
             type="text"
             {...register("firstName")}
+            placeholder="e.g. Jordan"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.firstName}
             aria-describedby={errors.firstName ? "firstName-error" : undefined}
@@ -76,6 +93,7 @@ export function ReliefRequestForm() {
             id="lastName"
             type="text"
             {...register("lastName")}
+            placeholder="e.g. Rivera"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.lastName}
             aria-describedby={errors.lastName ? "lastName-error" : undefined}
@@ -97,6 +115,7 @@ export function ReliefRequestForm() {
             id="email"
             type="email"
             {...register("email")}
+            placeholder="you@example.com"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
@@ -115,6 +134,7 @@ export function ReliefRequestForm() {
             id="phone"
             type="tel"
             {...register("phone")}
+            placeholder="e.g. (555) 555-1234"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? "phone-error" : undefined}
@@ -136,6 +156,7 @@ export function ReliefRequestForm() {
             id="city"
             type="text"
             {...register("city")}
+            placeholder="e.g. Houston"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.city}
             aria-describedby={errors.city ? "city-error" : undefined}
@@ -154,6 +175,7 @@ export function ReliefRequestForm() {
             id="state"
             type="text"
             {...register("state")}
+            placeholder="e.g. TX"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.state}
             aria-describedby={errors.state ? "state-error" : undefined}
@@ -194,6 +216,7 @@ export function ReliefRequestForm() {
           id="description"
           rows={5}
           {...register("description")}
+          placeholder="Provide details about the disaster, who is affected, and what support is needed."
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? "description-error" : undefined}
@@ -224,7 +247,7 @@ export function ReliefRequestForm() {
         )}
       </div>
 
-      {message && (
+      {message && message.type === "error" && (
         <div
           role="alert"
           className={`rounded-md p-4 ${
@@ -244,6 +267,7 @@ export function ReliefRequestForm() {
       >
         {isSubmitting ? "Submitting..." : "Submit Relief Request"}
       </button>
-    </form>
+      </form>
+    </>
   );
 }

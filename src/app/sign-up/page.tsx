@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function SignUpPage() {
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pt-24 pb-16">
       <section aria-labelledby="signup-heading">
         <h1 id="signup-heading" className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           Sign Up

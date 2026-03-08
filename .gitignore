@@ -39,6 +39,7 @@ pip-delete-this-directory.txt
 # ─── IDEs / Editors ──────────────────────────────────────
 .idea/
 .vscode/
+.cursor/
 
 # ─── OS / System Files ───────────────────────────────────
 .DS_Store

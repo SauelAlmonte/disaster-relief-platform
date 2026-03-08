@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { submitVolunteer } from "@/lib/actions";
 import { useState } from "react";
+import { FormSuccessModal } from "@/components/FormSuccessModal";
 
 const schema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -21,6 +22,8 @@ type FormData = z.infer<typeof schema>;
 
 export function VolunteerForm() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submittedName, setSubmittedName] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -36,7 +39,8 @@ export function VolunteerForm() {
     });
     const result = await submitVolunteer(formData);
     if (result.success) {
-      setMessage({ type: "success", text: result.message ?? "Thank you for signing up." });
+      setSubmittedName(`${data.firstName} ${data.lastName}`.trim());
+      setShowSuccess(true);
       reset();
     } else {
       setMessage({ type: "error", text: result.message ?? "Submission failed." });
@@ -44,7 +48,19 @@ export function VolunteerForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <>
+      {showSuccess && (
+        <FormSuccessModal
+          title="Volunteer form received"
+          body={
+            submittedName
+              ? `Thank you, ${submittedName}. Our team will review your information and contact you with next steps.`
+              : "Thank you for volunteering. Our team will review your information and contact you with next steps."
+          }
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -54,6 +70,7 @@ export function VolunteerForm() {
             id="firstName"
             type="text"
             {...register("firstName")}
+            placeholder="e.g. Jordan"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.firstName}
             aria-describedby={errors.firstName ? "firstName-error" : undefined}
@@ -72,6 +89,7 @@ export function VolunteerForm() {
             id="lastName"
             type="text"
             {...register("lastName")}
+            placeholder="e.g. Rivera"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.lastName}
             aria-describedby={errors.lastName ? "lastName-error" : undefined}
@@ -93,6 +111,7 @@ export function VolunteerForm() {
             id="email"
             type="email"
             {...register("email")}
+            placeholder="you@example.com"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
@@ -111,6 +130,7 @@ export function VolunteerForm() {
             id="phone"
             type="tel"
             {...register("phone")}
+            placeholder="e.g. (555) 555-1234"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? "phone-error" : undefined}
@@ -170,11 +190,12 @@ export function VolunteerForm() {
           id="notes"
           rows={4}
           {...register("notes")}
+          placeholder="Share anything else we should know about your availability or skills."
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
         />
       </div>
 
-      {message && (
+      {message && message.type === "error" && (
         <div
           role="alert"
           className={`rounded-md p-4 ${
@@ -194,6 +215,7 @@ export function VolunteerForm() {
       >
         {isSubmitting ? "Submitting..." : "Submit Volunteer Form"}
       </button>
-    </form>
+      </form>
+    </>
   );
 }

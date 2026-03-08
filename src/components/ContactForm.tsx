@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { submitContact } from "@/lib/actions";
 import { useState } from "react";
+import { FormSuccessModal } from "@/components/FormSuccessModal";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -17,6 +18,8 @@ type FormData = z.infer<typeof schema>;
 
 export function ContactForm() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submittedName, setSubmittedName] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -30,7 +33,8 @@ export function ContactForm() {
     Object.entries(data).forEach(([key, value]) => formData.append(key, String(value)));
     const result = await submitContact(formData);
     if (result.success) {
-      setMessage({ type: "success", text: result.message ?? "Message sent." });
+      setSubmittedName(data.name);
+      setShowSuccess(true);
       reset();
     } else {
       setMessage({ type: "error", text: result.message ?? "Failed to send." });
@@ -38,7 +42,19 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <>
+      {showSuccess && (
+        <FormSuccessModal
+          title="Message sent"
+          body={
+            submittedName
+              ? `Thank you, ${submittedName}. We have received your message and will get back to you soon.`
+              : "Thank you. We have received your message and will get back to you soon."
+          }
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Name
@@ -47,6 +63,7 @@ export function ContactForm() {
           id="name"
           type="text"
           {...register("name")}
+          placeholder="e.g. Jordan Rivera"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? "name-error" : undefined}
@@ -66,6 +83,7 @@ export function ContactForm() {
           id="email"
           type="email"
           {...register("email")}
+          placeholder="you@example.com"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? "email-error" : undefined}
@@ -85,6 +103,7 @@ export function ContactForm() {
           id="subject"
           type="text"
           {...register("subject")}
+          placeholder="Brief summary of your question or request"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.subject}
           aria-describedby={errors.subject ? "subject-error" : undefined}
@@ -104,6 +123,7 @@ export function ContactForm() {
           id="message"
           rows={5}
           {...register("message")}
+          placeholder="Share details about how we can help."
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "message-error" : undefined}
@@ -115,7 +135,7 @@ export function ContactForm() {
         )}
       </div>
 
-      {message && (
+      {message && message.type === "error" && (
         <div
           role="alert"
           className={`rounded-md p-4 ${
@@ -135,6 +155,7 @@ export function ContactForm() {
       >
         {isSubmitting ? "Sending..." : "Send Message"}
       </button>
-    </form>
+      </form>
+    </>
   );
 }

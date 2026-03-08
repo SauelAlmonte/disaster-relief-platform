@@ -49,6 +49,7 @@ export function SignUpForm() {
           id="email"
           type="email"
           {...register("email")}
+          placeholder="you@example.com"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? "email-error" : undefined}
@@ -68,6 +69,7 @@ export function SignUpForm() {
           id="password"
           type="password"
           {...register("password")}
+          placeholder="At least 8 characters"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.password}
           aria-describedby={errors.password ? "password-error" : undefined}
@@ -87,6 +89,7 @@ export function SignUpForm() {
           id="confirmPassword"
           type="password"
           {...register("confirmPassword")}
+          placeholder="Re-enter your password"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.confirmPassword}
           aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}

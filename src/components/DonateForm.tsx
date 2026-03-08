@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { submitDonate } from "@/lib/actions";
+import { createDonationCheckoutSession } from "@/lib/actions";
 import { useState } from "react";
 
 const schema = z.object({
@@ -31,17 +31,24 @@ export function DonateForm() {
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined) formData.append(key, String(value));
     });
-    const result = await submitDonate(formData);
-    if (result.success) {
-      setMessage({ type: "success", text: result.message ?? "Thank you for your donation." });
-      reset();
-    } else {
-      setMessage({ type: "error", text: result.message ?? "Donation failed." });
+    const result = await createDonationCheckoutSession(formData);
+    if (result.success && result.url) {
+      window.location.href = result.url;
+      return;
     }
+    setMessage({
+      type: "error",
+      text: result.success ? "Redirecting..." : result.message ?? "Donation failed.",
+    });
+    if (!result.success) reset(undefined, { keepValues: true });
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-6"
+      suppressHydrationWarning
+    >
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -51,6 +58,7 @@ export function DonateForm() {
             id="firstName"
             type="text"
             {...register("firstName")}
+            placeholder="e.g. Jordan"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.firstName}
             aria-describedby={errors.firstName ? "firstName-error" : undefined}
@@ -69,6 +77,7 @@ export function DonateForm() {
             id="lastName"
             type="text"
             {...register("lastName")}
+            placeholder="e.g. Rivera"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
             aria-invalid={!!errors.lastName}
             aria-describedby={errors.lastName ? "lastName-error" : undefined}
@@ -89,6 +98,7 @@ export function DonateForm() {
           id="email"
           type="email"
           {...register("email")}
+          placeholder="you@example.com"
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? "email-error" : undefined}
@@ -102,7 +112,7 @@ export function DonateForm() {
 
       <div>
         <label htmlFor="amount" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Donation Amount
+          Donation Amount (USD)
         </label>
         <input
           id="amount"
@@ -128,6 +138,7 @@ export function DonateForm() {
           id="message"
           rows={4}
           {...register("message")}
+          placeholder="Add any notes about how you would like this donation to be used."
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
         />
       </div>
@@ -150,7 +161,7 @@ export function DonateForm() {
         disabled={isSubmitting}
         className="rounded-lg bg-zinc-900 px-6 py-3 font-semibold text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        {isSubmitting ? "Processing..." : "Submit Donation"}
+        {isSubmitting ? "Redirecting to payment..." : "Continue to payment"}
       </button>
     </form>
   );

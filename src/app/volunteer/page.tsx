@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function VolunteerPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col px-4 pt-24 pb-16">
       <section aria-labelledby="volunteer-heading">
         <h1 id="volunteer-heading" className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           Volunteer with UnitedRelief

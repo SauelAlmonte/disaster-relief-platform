@@ -104,11 +104,7 @@ export function SignUpForm() {
       {message && (
         <div
           role="alert"
-          className={`rounded-md p-4 ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-              : "bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-          }`}
+          className="rounded-md p-4 bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300"
         >
           {message.text}
         </div>

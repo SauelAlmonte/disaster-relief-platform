@@ -5,7 +5,7 @@ function getStripe(): Stripe {
   if (!key) {
     throw new Error("Missing STRIPE_SECRET_KEY. Add it to .env.local for Stripe test mode.");
   }
-  return new Stripe(key, { apiVersion: "2024-11-20.acacia" });
+  return new Stripe(key, { apiVersion: "2026-02-25.clover" });
 }
 
 export { getStripe };

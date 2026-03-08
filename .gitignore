@@ -1,16 +1,3 @@
-# ─── Python ──────────────────────────────────────────────
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.egg-info/
-
-# ─── Virtual Environments ────────────────────────────────
-.venv/
-venv/
-server/.venv/
-server/venv/
-
 # ─── Environment Variables / Secrets ─────────────────────
 .env
 .env.*
